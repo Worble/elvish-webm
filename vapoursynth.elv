@@ -15,16 +15,18 @@ fn open_vsedit [input_file]{
 	vsedit $temp_script
 }
 
-fn encode_webm [&crf=30 &qmin=0 &qmax=63]{
+fn encode_webm [&number=1 &crf=30 &qmin=0 &qmax=63]{
 	if (not ?(test -n $name)) {
 		fail "No filename for output - have you run open_vsedit?" 
 	}
+
+	output=$E:HOME'/Videos/'$name'_'$number.webm
 
 	#pass 1
 	vspipe $temp_script - --y4m | ffmpeg -i - -c:v libvpx -b:v 0 -crf $crf -pass 1 -an -f webm -y -passlogfile $E:XDG_RUNTIME_DIR/ffmpeg2pass /dev/null
 	
 	#pass 2
-	vspipe $temp_script - --y4m | ffmpeg -f yuv4mpegpipe -i - -c:v libvpx -b:v 0 -crf $crf -an -qmin $qmin -qmax $qmax -passlogfile $E:XDG_RUNTIME_DIR/ffmpeg2pass -pass 2 ~/Videos/$name.webm
+	vspipe $temp_script - --y4m | ffmpeg -f yuv4mpegpipe -i - -c:v libvpx -b:v 0 -crf $crf -an -qmin $qmin -qmax $qmax -passlogfile $E:XDG_RUNTIME_DIR/ffmpeg2pass -pass 2 $output
 }
 
 fn output_images [number]{
